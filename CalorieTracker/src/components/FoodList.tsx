@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { FoodEntry } from '../services/storageService';
 import { formatTime } from '../utils/dateUtils';
+import { validateCalorieInput } from '../services/errorHandler';
 
 interface FoodListProps {
   entries: FoodEntry[];
@@ -48,12 +49,12 @@ export const FoodList: React.FC<FoodListProps> = ({
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Save', 
-          onPress: (calorieText) => {
-            const calories = parseInt(calorieText || '0', 10);
-            if (calories > 0 && calories <= 2000) {
-              onEditEntry({ ...entry, calories });
+          onPress: (calorieText?: string) => {
+            const validation = validateCalorieInput(calorieText || '');
+            if (validation.isValid && validation.calories) {
+              onEditEntry({ ...entry, calories: validation.calories });
             } else {
-              Alert.alert('Error', 'Please enter a valid calorie amount (1-2000)');
+              Alert.alert('Error', validation.error || 'Please enter a valid calorie amount');
             }
           }
         }

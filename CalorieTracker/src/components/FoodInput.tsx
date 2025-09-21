@@ -9,7 +9,7 @@ import {
   ActivityIndicator 
 } from 'react-native';
 import { geminiClient } from '../services/geminiClient';
-import { searchOfflineFood } from '../services/offlineFoods';
+import { handleFoodInputError, validateCalorieInput } from '../services/errorHandler';
 
 interface FoodInputProps {
   onAddFood: (name: string, calories: number) => void;
@@ -29,62 +29,41 @@ export const FoodInput: React.FC<FoodInputProps> = ({ onAddFood, disabled = fals
     setIsLoading(true);
 
     try {
-      let calories: number | null = null;
-      let source = '';
-
-      // First, try offline dictionary
-      calories = searchOfflineFood(foodName);
-      if (calories) {
-        source = 'offline';
-      } else {
-        // Try Gemini API if available
-        const hasApiKey = await geminiClient.hasApiKey();
-        if (hasApiKey) {
-          try {
-            calories = await geminiClient.estimateCalories(foodName);
-            source = 'gemini';
-          } catch (error) {
-            console.log('Gemini API failed, will ask for manual entry');
-          }
-        }
-      }
+      // Always use Gemini AI - simple and smart
+      const calories = await geminiClient.estimateCalories(foodName);
 
       if (calories !== null) {
-        // Show confirmation with estimated calories
-        const message = source === 'gemini' 
-          ? `Estimated calories for "${foodName}": ${calories} cal\n\nIs this correct?`
-          : `Found "${foodName}" in our database: ${calories} cal\n\nIs this correct?`;
-          
+        // Show confirmation with AI estimate
         Alert.alert(
           'Confirm Calories',
-          message,
+          `🤖 Estimated calories for "${foodName}": ${calories} cal\n\nIs this correct?`,
           [
             { text: 'Edit', style: 'cancel' },
             { 
               text: 'Add', 
               onPress: () => {
-                onAddFood(foodName.trim(), calories!);
+                onAddFood(foodName.trim(), calories);
                 setFoodName('');
               }
             }
           ]
         );
       } else {
-        // No estimate available, ask for manual entry
+        // AI failed, ask for manual entry
         Alert.prompt(
           'Enter Calories',
-          `We couldn't find "${foodName}" in our database. Please enter the calories manually:`,
+          `We couldn't estimate calories for "${foodName}". Please enter the calories manually:`,
           [
             { text: 'Cancel', style: 'cancel' },
             { 
               text: 'Add', 
-              onPress: (calorieText) => {
-                const calories = parseInt(calorieText || '0', 10);
-                if (calories > 0 && calories <= 2000) {
-                  onAddFood(foodName.trim(), calories);
+              onPress: (calorieText?: string) => {
+                const validation = validateCalorieInput(calorieText || '');
+                if (validation.isValid && validation.calories) {
+                  onAddFood(foodName.trim(), validation.calories);
                   setFoodName('');
                 } else {
-                  Alert.alert('Error', 'Please enter a valid calorie amount (1-2000)');
+                  Alert.alert('Error', validation.error || 'Please enter a valid calorie amount');
                 }
               }
             }
@@ -96,7 +75,8 @@ export const FoodInput: React.FC<FoodInputProps> = ({ onAddFood, disabled = fals
       }
     } catch (error) {
       console.error('Error adding food:', error);
-      Alert.alert('Error', 'Failed to add food item. Please try again.');
+      const errorMessage = handleFoodInputError(error);
+      Alert.alert('Error', errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -107,7 +87,7 @@ export const FoodInput: React.FC<FoodInputProps> = ({ onAddFood, disabled = fals
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Enter food item (e.g., apple, 2 slices of bread)"
+          placeholder="Enter food item (e.g., chicken breast, apple, 2 eggs, pizza slice)"
           value={foodName}
           onChangeText={setFoodName}
           editable={!disabled && !isLoading}
@@ -130,7 +110,7 @@ export const FoodInput: React.FC<FoodInputProps> = ({ onAddFood, disabled = fals
       </View>
       
       <Text style={styles.helpText}>
-        💡 Try: "apple", "chicken breast", "2 eggs", "1 cup rice"
+        💡 AI-powered: Just type any food item and we'll estimate the calories!
       </Text>
     </View>
   );
