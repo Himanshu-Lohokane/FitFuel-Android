@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
 const API_KEY_STORAGE_KEY = 'gemini_api_key';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
 
 /**
  * Gemini API client for calorie estimation
@@ -61,7 +61,7 @@ class GeminiClient {
     }
 
     try {
-      const prompt = `Estimate calories for: ${foodItem}. Respond with only a number representing total calories for a standard serving size.`;
+      const prompt = `Estimate calories for: ${foodItem}. Respond with only a number representing total calories. If quantity is not specified, assume a reasonable size [middle ground].`;
       
       const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',
