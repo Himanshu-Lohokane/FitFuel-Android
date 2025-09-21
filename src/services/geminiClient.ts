@@ -52,6 +52,7 @@ class GeminiClient {
 
   /**
    * Estimate calories for a food item using Gemini API
+   * Simple system prompt: AI estimates calories, handles quantities automatically
    */
   async estimateCalories(foodItem: string): Promise<number> {
     const apiKey = await this.getApiKey();
@@ -61,7 +62,8 @@ class GeminiClient {
     }
 
     try {
-      const prompt = `Estimate calories for: ${foodItem}. Respond with only a number representing total calories for a standard serving size.`;
+      // Simple, smart system prompt
+      const prompt = `Estimate the calories for: ${foodItem}. If quantity is not specified, assume a reasonable serving size. Respond with only a number representing total calories.`;
       
       const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',
@@ -89,7 +91,7 @@ class GeminiClient {
 
       const responseText = data.candidates[0].content.parts[0].text.trim();
       
-      // Extract number from response
+      // Simple number extraction - get the first number found
       const calorieMatch = responseText.match(/\d+/);
       
       if (!calorieMatch) {
@@ -107,14 +109,12 @@ class GeminiClient {
     } catch (error) {
       console.error('Gemini API error:', error);
       
-      // Re-throw with more user-friendly error message
+      // Simple error handling
       if (error instanceof Error) {
         if (error.message.includes('API key not configured')) {
           throw new Error('Please configure your Gemini API key in settings');
         } else if (error.message.includes('API request failed')) {
           throw new Error('Failed to connect to Gemini API. Please check your internet connection and API key.');
-        } else if (error.message.includes('parse calories')) {
-          throw new Error('Could not understand the food item. Please try rephrasing or enter calories manually.');
         } else {
           throw new Error('Unable to estimate calories. Please try again or enter manually.');
         }

@@ -160,3 +160,6 @@ class StorageService {
 }
 
 export const storageService = new StorageService();
+
+// Export geminiClient for easy access
+export { geminiClient } from './geminiClient';
