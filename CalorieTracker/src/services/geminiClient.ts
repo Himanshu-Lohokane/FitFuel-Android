@@ -1,7 +1,7 @@
 import * as SecureStore from 'expo-secure-store';
 
 const API_KEY_STORAGE_KEY = 'gemini_api_key';
-const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent';
+const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent';
 
 /**
  * Gemini API client for calorie estimation
