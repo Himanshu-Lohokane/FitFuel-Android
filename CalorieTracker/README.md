@@ -1,6 +1,6 @@
-# 🎯 Simple Calorie Tracker - AI Powered
+# 🎯 FitFuel - AI Powered Nutrition Tracker
 
-A lightweight, privacy-focused calorie tracking app built with React Native and Expo. **Pure AI-powered** with your Gemini API key pre-configured!
+A lightweight, privacy-focused nutrition tracking app built with React Native and Expo. **Pure AI-powered** calorie and protein tracking with your Gemini API key pre-configured!
 
 ## 🚀 **Quick Start (3 Steps)**
 
@@ -22,30 +22,30 @@ npm start
 
 ### 3. Start Tracking!
 - Type any food: "apple", "chicken breast", "3 small apples", "2 eggs"
-- Tap "Add" - AI estimates calories automatically
-- Confirm and track your daily intake!
+- Tap "Add" - AI estimates calories and protein automatically
+- Confirm and track your daily nutrition intake!
 
 ## 🧠 **How It Works**
 
 ### **Simple & Smart Approach:**
-- **Pure AI-Powered**: Uses Gemini AI for all calorie estimation
+- **Pure AI-Powered**: Uses Gemini AI for all nutrition estimation (calories & protein)
 - **No Complex Logic**: Just type anything, AI figures it out
-- **Smart Backend**: AI handles quantities automatically
+- **Smart Backend**: AI handles quantities and nutrition automatically
 
 ### **Examples:**
 | What You Type | AI Response | Result |
 |---------------|-------------|---------|
-| "apple" | Assumes 1 medium apple | 80 cal |
-| "3 small apples" | Calculates for 3 small apples | 180 cal |
-| "chicken breast" | Assumes 100g serving | 165 cal |
-| "2 eggs" | Calculates for 2 eggs | 140 cal |
-| "pizza slice" | Assumes 1 slice | 250 cal |
+| "apple" | Assumes 1 medium apple | 80 cal, 0g protein |
+| "3 small apples" | Calculates for 3 small apples | 180 cal, 1g protein |
+| "chicken breast" | Assumes 100g serving | 165 cal, 31g protein |
+| "2 eggs" | Calculates for 2 eggs | 140 cal, 12g protein |
+| "pizza slice" | Assumes 1 slice | 250 cal, 12g protein |
 
 ## 📱 **Features**
 
 ### ✅ **Core Features**
-- **AI Calorie Estimation**: Gemini AI estimates calories for any food
-- **Daily Tracking**: Real-time calorie counter with progress bar
+- **AI Nutrition Estimation**: Gemini AI estimates calories and protein for any food
+- **Dual Tracking**: Real-time calorie and protein counters with progress bar
 - **Food Management**: Add, edit, delete food entries with simple gestures
 - **Local Storage**: All data stored on your device (100% private)
 - **Settings**: API key management and daily goal setting
@@ -53,7 +53,7 @@ npm start
 ### ✅ **Smart Features**
 - **Quantity Handling**: AI automatically interprets amounts ("3 apples", "200gm chicken")
 - **Serving Size Intelligence**: AI assumes reasonable portions when not specified
-- **Manual Fallback**: Enter calories manually if AI fails
+- **Manual Fallback**: Enter nutrition values manually if AI fails
 - **Data Persistence**: Survives app restarts and updates
 
 ### ✅ **Privacy & Security**
@@ -66,15 +66,15 @@ npm start
 
 ### **Adding Food Items**
 1. **Type food description**: "chicken breast", "3 small apples", "2 eggs"
-2. **Tap "Add" button**: AI estimates calories automatically
-3. **Review estimate**: Shows "🤖 Estimated calories for '3 small apples': 180 cal"
+2. **Tap "Add" button**: AI estimates calories and protein automatically
+3. **Review estimate**: Shows "🤖 Estimated for '3 small apples': 180 cal, 1g protein"
 4. **Confirm or edit**: Tap "Add" to confirm or "Edit" to modify
 
 ### **Managing Entries**
-- **Edit calories**: Tap any food item to change calories
+- **Edit nutrition**: Tap any food item to change calories and protein
 - **Delete entry**: Long press any food item to remove it
 - **Refresh data**: Pull down the food list to refresh
-- **View progress**: Daily total and progress bar at the top
+- **View progress**: Daily totals and progress bar at the top
 
 ### **Settings**
 - **Access settings**: Tap ⚙️ icon in top right
@@ -87,8 +87,8 @@ npm start
 ### **Architecture**
 ```
 App.tsx (Main Container)
-├── CalorieDisplay.tsx (Daily total & progress)
-├── FoodInput.tsx (AI-powered food entry)
+├── CalorieDisplay.tsx (Daily nutrition totals & progress)
+├── FoodInput.tsx (AI-powered nutrition entry)
 ├── FoodList.tsx (Today's entries with edit/delete)
 └── Settings.tsx (API key & configuration)
 ```
@@ -100,8 +100,8 @@ App.tsx (Main Container)
 - **dateUtils.ts**: Date formatting and utilities
 
 ### **AI Integration**
-- **Simple Prompt**: "Estimate the calories for: [USER_INPUT]. If quantity is not specified, assume a reasonable serving size. Respond with only a number representing total calories."
-- **Smart Parsing**: Extracts first number from AI response
+- **Simple Prompt**: "Estimate calories and protein for: [USER_INPUT]. Respond with: calories,protein (e.g., '150,12' for 150 calories and 12g protein)."
+- **Smart Parsing**: Extracts nutrition values from AI response format
 - **Error Handling**: Graceful fallback to manual entry
 
 ## 📊 **Data Storage**
@@ -114,6 +114,7 @@ App.tsx (Main Container)
       "id": "1234567890",
       "name": "3 small apples",
       "calories": 180,
+      "protein": 1,
       "timestamp": "2025-09-21T10:30:00.000Z"
     }
   ]
@@ -196,10 +197,10 @@ npm start
 
 #### **Test AI Estimation**
 Try these examples:
-- "apple" → Should get ~80 calories
-- "3 small apples" → Should get ~180 calories
-- "chicken breast" → Should get ~165 calories
-- "2 eggs" → Should get ~140 calories
+- "apple" → Should get ~80 calories, 0g protein
+- "3 small apples" → Should get ~180 calories, 1g protein
+- "chicken breast" → Should get ~165 calories, 31g protein
+- "2 eggs" → Should get ~140 calories, 12g protein
 
 #### **Test Data Persistence**
 1. Add several food items
@@ -219,16 +220,16 @@ AIzaSyD5uHFqnC7n8M-4HUR3Oh19MnoRQpHdmtk
 
 **Status**: ✅ Pre-configured and ready to use!
 
-The app automatically uses this key for AI-powered calorie estimation.
+The app automatically uses this key for AI-powered nutrition estimation.
 
 ## 🎉 **Success!**
 
-**Your Simple Calorie Tracker is complete and ready to use!**
+**Your FitFuel Nutrition Tracker is complete and ready to use!**
 
 ### **What You Have:**
-- ✅ **Pure AI-powered** calorie estimation
+- ✅ **Pure AI-powered** nutrition estimation (calories & protein)
 - ✅ **Simple UI** - just type and tap
-- ✅ **Smart backend** - AI handles quantities automatically
+- ✅ **Smart backend** - AI handles quantities and nutrition automatically
 - ✅ **Privacy-focused** - 100% local data storage
 - ✅ **Production-ready** - professional code quality
 - ✅ **Pre-configured** - your Gemini API key is ready
@@ -236,7 +237,7 @@ The app automatically uses this key for AI-powered calorie estimation.
 ### **Ready to Start:**
 1. Run `npm start` in the CalorieTracker directory
 2. Scan QR code with Expo Go app
-3. Start tracking calories with AI-powered estimation!
+3. Start tracking nutrition with AI-powered estimation!
 
 ---
 
