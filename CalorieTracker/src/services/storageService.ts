@@ -5,6 +5,7 @@ export interface FoodEntry {
   id: string;
   name: string;
   calories: number;
+  protein: number;
   timestamp: string;
 }
 
@@ -116,6 +117,14 @@ class StorageService {
   async getTodaysTotalCalories(): Promise<number> {
     const todaysEntries = await this.getTodaysEntries();
     return todaysEntries.reduce((total, entry) => total + entry.calories, 0);
+  }
+
+  /**
+   * Calculate today's total protein
+   */
+  async getTodaysTotalProtein(): Promise<number> {
+    const todaysEntries = await this.getTodaysEntries();
+    return todaysEntries.reduce((total, entry) => total + entry.protein, 0);
   }
 
   /**

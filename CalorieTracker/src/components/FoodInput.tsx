@@ -12,7 +12,7 @@ import { geminiClient } from '../services/geminiClient';
 import { handleFoodInputError, validateCalorieInput } from '../services/errorHandler';
 
 interface FoodInputProps {
-  onAddFood: (name: string, calories: number) => void;
+  onAddFood: (name: string, calories: number, protein: number) => void;
   disabled?: boolean;
 }
 
@@ -30,19 +30,19 @@ export const FoodInput: React.FC<FoodInputProps> = ({ onAddFood, disabled = fals
 
     try {
       // Always use Gemini AI - simple and smart
-      const calories = await geminiClient.estimateCalories(foodName);
+      const nutrition = await geminiClient.estimateNutrition(foodName);
 
-      if (calories !== null) {
+      if (nutrition !== null) {
         // Show confirmation with AI estimate
         Alert.alert(
-          'Confirm Calories',
-          `🤖 Estimated calories for "${foodName}": ${calories} cal\n\nIs this correct?`,
+          'Confirm Nutrition',
+          `🤖 Estimated for "${foodName}":\n${nutrition.calories} calories, ${nutrition.protein}g protein\n\nIs this correct?`,
           [
             { text: 'Edit', style: 'cancel' },
             { 
               text: 'Add', 
               onPress: () => {
-                onAddFood(foodName.trim(), calories);
+                onAddFood(foodName.trim(), nutrition.calories, nutrition.protein);
                 setFoodName('');
               }
             }
@@ -51,26 +51,32 @@ export const FoodInput: React.FC<FoodInputProps> = ({ onAddFood, disabled = fals
       } else {
         // AI failed, ask for manual entry
         Alert.prompt(
-          'Enter Calories',
-          `We couldn't estimate calories for "${foodName}". Please enter the calories manually:`,
+          'Enter Nutrition',
+          `We couldn't estimate nutrition for "${foodName}". Please enter calories and protein (format: "150,12"):`,
           [
             { text: 'Cancel', style: 'cancel' },
             { 
               text: 'Add', 
-              onPress: (calorieText?: string) => {
-                const validation = validateCalorieInput(calorieText || '');
-                if (validation.isValid && validation.calories) {
-                  onAddFood(foodName.trim(), validation.calories);
-                  setFoodName('');
+              onPress: (nutritionText?: string) => {
+                const nutritionMatch = nutritionText?.match(/(\d+),(\d+)/);
+                if (nutritionMatch) {
+                  const calories = parseInt(nutritionMatch[1], 10);
+                  const protein = parseInt(nutritionMatch[2], 10);
+                  if (calories > 0 && calories <= 2000 && protein >= 0 && protein <= 200) {
+                    onAddFood(foodName.trim(), calories, protein);
+                    setFoodName('');
+                  } else {
+                    Alert.alert('Error', 'Please enter valid amounts (calories: 1-2000, protein: 0-200)');
+                  }
                 } else {
-                  Alert.alert('Error', validation.error || 'Please enter a valid calorie amount');
+                  Alert.alert('Error', 'Please use format: "150,12" (calories,protein)');
                 }
               }
             }
           ],
           'plain-text',
           '',
-          'numeric'
+          'default'
         );
       }
     } catch (error) {

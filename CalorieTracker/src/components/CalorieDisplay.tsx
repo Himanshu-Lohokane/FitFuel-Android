@@ -3,11 +3,13 @@ import { View, Text, StyleSheet } from 'react-native';
 
 interface CalorieDisplayProps {
   totalCalories: number;
+  totalProtein: number;
   goalCalories?: number;
 }
 
 export const CalorieDisplay: React.FC<CalorieDisplayProps> = ({ 
   totalCalories, 
+  totalProtein,
   goalCalories = 2000 
 }) => {
   const progressPercentage = Math.min((totalCalories / goalCalories) * 100, 100);
@@ -15,10 +17,20 @@ export const CalorieDisplay: React.FC<CalorieDisplayProps> = ({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Today's Calories</Text>
-      <Text style={[styles.total, isOverGoal && styles.overGoal]}>
-        {totalCalories.toLocaleString()}
-      </Text>
+      <View style={styles.statsRow}>
+        <View style={styles.statItem}>
+          <Text style={styles.label}>Calories</Text>
+          <Text style={[styles.total, isOverGoal && styles.overGoal]}>
+            {totalCalories.toLocaleString()}
+          </Text>
+        </View>
+        <View style={styles.statItem}>
+          <Text style={styles.label}>Protein</Text>
+          <Text style={styles.total}>
+            {totalProtein.toLocaleString()}g
+          </Text>
+        </View>
+      </View>
       
       {goalCalories > 0 && (
         <View style={styles.progressContainer}>
@@ -63,17 +75,26 @@ const styles = StyleSheet.create({
     shadowRadius: 3.84,
     elevation: 5,
   },
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 16,
+  },
+  statItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
   label: {
-    fontSize: 18,
+    fontSize: 16,
     color: '#666',
     marginBottom: 8,
     fontWeight: '500',
   },
   total: {
-    fontSize: 48,
+    fontSize: 36,
     fontWeight: 'bold',
     color: '#2c3e50',
-    marginBottom: 16,
   },
   overGoal: {
     color: '#e74c3c',

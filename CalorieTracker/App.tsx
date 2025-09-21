@@ -18,6 +18,7 @@ import { storageService, FoodEntry, geminiClient } from './src/services/storageS
 export default function App() {
   const [todaysEntries, setTodaysEntries] = useState<FoodEntry[]>([]);
   const [totalCalories, setTotalCalories] = useState(0);
+  const [totalProtein, setTotalProtein] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -49,10 +50,12 @@ export default function App() {
   const loadTodaysData = async () => {
     try {
       const entries = await storageService.getTodaysEntries();
-      const total = await storageService.getTodaysTotalCalories();
+      const totalCal = await storageService.getTodaysTotalCalories();
+      const totalProt = await storageService.getTodaysTotalProtein();
       
       setTodaysEntries(entries);
-      setTotalCalories(total);
+      setTotalCalories(totalCal);
+      setTotalProtein(totalProt);
     } catch (error) {
       console.error('Error loading data:', error);
       Alert.alert('Error', 'Failed to load your data. Please try again.');
@@ -61,9 +64,9 @@ export default function App() {
     }
   };
 
-  const handleAddFood = async (name: string, calories: number) => {
+  const handleAddFood = async (name: string, calories: number, protein: number) => {
     try {
-      await storageService.addFoodEntry({ name, calories });
+      await storageService.addFoodEntry({ name, calories, protein });
       await loadTodaysData(); // Refresh data
     } catch (error) {
       console.error('Error adding food:', error);
@@ -150,10 +153,11 @@ export default function App() {
         </TouchableOpacity>
       </View>
 
-      <CalorieDisplay 
-        totalCalories={totalCalories} 
-        goalCalories={goalCalories}
-      />
+        <CalorieDisplay 
+          totalCalories={totalCalories} 
+          totalProtein={totalProtein}
+          goalCalories={goalCalories} 
+        />
 
       <FoodInput 
         onAddFood={handleAddFood}

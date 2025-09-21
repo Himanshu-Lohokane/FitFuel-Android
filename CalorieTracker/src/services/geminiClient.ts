@@ -51,9 +51,9 @@ class GeminiClient {
   }
 
   /**
-   * Estimate calories for a food item using Gemini API
+   * Estimate calories and protein for a food item using Gemini API
    */
-  async estimateCalories(foodItem: string): Promise<number> {
+  async estimateNutrition(foodItem: string): Promise<{calories: number, protein: number}> {
     const apiKey = await this.getApiKey();
     
     if (!apiKey) {
@@ -61,7 +61,7 @@ class GeminiClient {
     }
 
     try {
-      const prompt = `Estimate calories for: ${foodItem}. Respond with only a number representing total calories. If quantity is not specified, assume a reasonable size [middle ground].`;
+      const prompt = `Estimate calories and protein for: ${foodItem}. Respond with only two numbers separated by a comma: calories,protein (e.g., "150,12" for 150 calories and 12g protein).`;
       
       const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}`, {
         method: 'POST',
@@ -89,21 +89,26 @@ class GeminiClient {
 
       const responseText = data.candidates[0].content.parts[0].text.trim();
       
-      // Extract number from response
-      const calorieMatch = responseText.match(/\d+/);
+      // Extract calories and protein from response (format: "150,12")
+      const nutritionMatch = responseText.match(/(\d+),(\d+)/);
       
-      if (!calorieMatch) {
-        throw new Error('Could not parse calories from response');
+      if (!nutritionMatch) {
+        throw new Error('Could not parse nutrition data from response');
       }
 
-      const calories = parseInt(calorieMatch[0], 10);
+      const calories = parseInt(nutritionMatch[1], 10);
+      const protein = parseInt(nutritionMatch[2], 10);
       
-      // Validate calorie range (reasonable bounds)
+      // Validate ranges
       if (calories < 1 || calories > 2000) {
         throw new Error('Calorie estimate seems unreasonable');
       }
+      
+      if (protein < 0 || protein > 200) {
+        throw new Error('Protein estimate seems unreasonable');
+      }
 
-      return calories;
+      return { calories, protein };
     } catch (error) {
       console.error('Gemini API error:', error);
       
@@ -129,7 +134,7 @@ class GeminiClient {
    */
   async testConnection(): Promise<boolean> {
     try {
-      await this.estimateCalories('apple');
+      await this.estimateNutrition('apple');
       return true;
     } catch (error) {
       return false;

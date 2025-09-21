@@ -43,25 +43,31 @@ export const FoodList: React.FC<FoodListProps> = ({
 
   const handleEditEntry = (entry: FoodEntry) => {
     Alert.prompt(
-      'Edit Calories',
-      `Edit calories for "${entry.name}":`,
+      'Edit Nutrition',
+      `Edit nutrition for "${entry.name}" (format: "calories,protein"):`,
       [
         { text: 'Cancel', style: 'cancel' },
         { 
           text: 'Save', 
-          onPress: (calorieText?: string) => {
-            const validation = validateCalorieInput(calorieText || '');
-            if (validation.isValid && validation.calories) {
-              onEditEntry({ ...entry, calories: validation.calories });
+          onPress: (nutritionText?: string) => {
+            const nutritionMatch = nutritionText?.match(/(\d+),(\d+)/);
+            if (nutritionMatch) {
+              const calories = parseInt(nutritionMatch[1], 10);
+              const protein = parseInt(nutritionMatch[2], 10);
+              if (calories > 0 && calories <= 2000 && protein >= 0 && protein <= 200) {
+                onEditEntry({ ...entry, calories, protein });
+              } else {
+                Alert.alert('Error', 'Please enter valid amounts (calories: 1-2000, protein: 0-200)');
+              }
             } else {
-              Alert.alert('Error', validation.error || 'Please enter a valid calorie amount');
+              Alert.alert('Error', 'Please use format: "150,12" (calories,protein)');
             }
           }
         }
       ],
       'plain-text',
-      entry.calories.toString(),
-      'numeric'
+      `${entry.calories},${entry.protein}`,
+      'default'
     );
   };
 
@@ -77,9 +83,11 @@ export const FoodList: React.FC<FoodListProps> = ({
           {formatTime(new Date(item.timestamp))}
         </Text>
       </View>
-      <View style={styles.calorieContainer}>
-        <Text style={styles.calorieAmount}>{item.calories}</Text>
-        <Text style={styles.calorieUnit}>cal</Text>
+      <View style={styles.nutritionContainer}>
+        <Text style={styles.nutritionAmount}>{item.calories}</Text>
+        <Text style={styles.nutritionUnit}>cal</Text>
+        <Text style={styles.nutritionAmount}>{item.protein}g</Text>
+        <Text style={styles.nutritionUnit}>protein</Text>
       </View>
     </TouchableOpacity>
   );
@@ -174,17 +182,17 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#7f8c8d',
   },
-  calorieContainer: {
+  nutritionContainer: {
     alignItems: 'center',
-    minWidth: 60,
+    minWidth: 80,
   },
-  calorieAmount: {
-    fontSize: 18,
+  nutritionAmount: {
+    fontSize: 16,
     fontWeight: 'bold',
     color: '#3498db',
   },
-  calorieUnit: {
-    fontSize: 12,
+  nutritionUnit: {
+    fontSize: 10,
     color: '#7f8c8d',
     marginTop: -2,
   },
